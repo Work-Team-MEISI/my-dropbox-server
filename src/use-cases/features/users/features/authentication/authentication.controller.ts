@@ -1,65 +1,107 @@
 import {
+  Body,
   Controller,
   Get,
-  HttpException,
   HttpStatus,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
+import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
+import { User } from '../../types/user.type';
+import { AuthenticationService } from './authentication.service';
 import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
 import SignInDTO from './dtos/sign-in.dto';
 import SignUpDTO from './dtos/sign-up.dto';
+import { UpdatePasswordDTO } from './dtos/update-password.dto';
 import * as bcrypt from 'bcrypt';
-import { AuthenticationService } from './authentication.service';
-import { AuthenticationErrorMessages } from './constants/authentication-error-messages.enum';
-import { GlobalErrorMessages } from 'src/helpers/constants/global-error-messages.enum';
 
 @Controller('authentication')
 export class AuthenticationController {
   constructor(private readonly _authenticationService: AuthenticationService) {}
 
   @Get()
-  public async signIn(@Query() signInDTO: SignInDTO): Promise<string> {
+  public async signIn(@Body() signInDTO: SignInDTO): Promise<User> {
+    const searchEmail = { email: signInDTO.email };
+
     const user = await this._authenticationService
-      .fetch({
-        email: signInDTO.email,
-      })
+      .fetch(searchEmail)
       .catch((error) => {
-        throw new HttpException(
-          GlobalErrorMessages.INTERNAL_SERVER_ERROR,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
       });
 
-    if (user === undefined) {
-      throw new HttpException(
-        AuthenticationErrorMessages.USER_NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
+    if (typeof user === 'undefined') {
+      throw ExceptionsHandler(HttpStatus.NOT_FOUND);
     }
 
-    const hashedPassword = await bcrypt
-      .hash(signInDTO.password, 10)
-      .catch((error) => {
-        throw error;
-      });
+    const { password } = signInDTO;
 
-    if (hashedPassword !== user.password) {
-      throw new HttpException(
-        AuthenticationErrorMessages.WRONG_PASSWORD,
-        HttpStatus.BAD_REQUEST,
-      );
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    if (comparePassword === false) {
+      throw ExceptionsHandler(HttpStatus.BAD_REQUEST);
     }
-    return JSON.stringify(user);
+
+    return user;
   }
 
   @Post()
-  public signUp(@Query() signUpDTO: SignUpDTO): string {
-    return '';
+  public async signUp(@Body() signUpDTO: SignUpDTO): Promise<User> {
+    const searchedEmail = { email: signUpDTO.email };
+
+    const searchedUser = await this._authenticationService
+      .fetch(searchedEmail)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    if (typeof searchedUser !== 'undefined') {
+      throw ExceptionsHandler(HttpStatus.FOUND);
+    }
+
+    const { email, username, password } = signUpDTO;
+
+    const newUser = {
+      email: email,
+      username: username,
+      password: await bcrypt.hash(password, 10),
+    };
+
+    const createdUser = await this._authenticationService
+      .create(newUser)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    return createdUser;
   }
 
-  @Get()
-  public forgotPassword(@Query() forgotPasswordDTO: ForgotPasswordDTO): string {
-    return '';
+  @Put()
+  public async forgotPassword(
+    @Body() forgotPasswordDTO: ForgotPasswordDTO,
+  ): Promise<User> {
+    const searchedEmail = { email: forgotPasswordDTO.email };
+
+    const searchedUser = await this._authenticationService
+      .fetch(searchedEmail)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    if (typeof searchedUser !== 'undefined') {
+      throw ExceptionsHandler(HttpStatus.FOUND);
+    }
+
+    const hashedPassword = await bcrypt.hash(forgotPasswordDTO.password, 10);
+
+    const updatePassword = { password: hashedPassword };
+
+    const updatedUser = this._authenticationService
+      .update(searchedEmail, updatePassword)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    return updatedUser;
   }
 }
