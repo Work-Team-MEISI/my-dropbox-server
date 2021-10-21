@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UseCasesModule } from './use-cases/use-cases.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './use-cases/features/users/entities/user.entity';
 
 @Module({
   imports: [
@@ -10,11 +11,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 4320,
-      username: 'admin',
+      port: 5432,
+      username: 'postgres',
       password: 'admin',
       database: 'my-dropbox',
-      entities: ['./use-cases/features/**/entities/*.entity.ts'],
+      entities: [UserEntity],
       synchronize: true,
     }),
   ],

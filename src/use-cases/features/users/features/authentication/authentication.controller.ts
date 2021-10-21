@@ -11,17 +11,16 @@ import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
 import { User } from '../../types/user.type';
 import { AuthenticationService } from './authentication.service';
 import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
-import SignInDTO from './dtos/sign-in.dto';
-import SignUpDTO from './dtos/sign-up.dto';
-import { UpdatePasswordDTO } from './dtos/update-password.dto';
 import * as bcrypt from 'bcrypt';
+import { SignInDTO } from './dtos/sign-in.dto';
+import { SignUpDTO } from './dtos/sign-up.dto';
 
-@Controller('authentication')
+@Controller('users/authentication')
 export class AuthenticationController {
   constructor(private readonly _authenticationService: AuthenticationService) {}
 
-  @Get()
-  public async signIn(@Body() signInDTO: SignInDTO): Promise<User> {
+  @Get('sign-in')
+  public async signIn(@Query() signInDTO: SignInDTO): Promise<User> {
     const searchEmail = { email: signInDTO.email };
 
     const user = await this._authenticationService
@@ -45,7 +44,7 @@ export class AuthenticationController {
     return user;
   }
 
-  @Post()
+  @Post('sign-up')
   public async signUp(@Body() signUpDTO: SignUpDTO): Promise<User> {
     const searchedEmail = { email: signUpDTO.email };
 
@@ -76,11 +75,12 @@ export class AuthenticationController {
     return createdUser;
   }
 
-  @Put()
+  @Put('forgot-password')
   public async forgotPassword(
+    @Query() email: string,
     @Body() forgotPasswordDTO: ForgotPasswordDTO,
   ): Promise<User> {
-    const searchedEmail = { email: forgotPasswordDTO.email };
+    const searchedEmail = { email: email };
 
     const searchedUser = await this._authenticationService
       .fetch(searchedEmail)
