@@ -25,7 +25,7 @@ export class AuthenticationService implements IService<UserEntity> {
 
   public async update<K, V>(queryParam: V, data: K): Promise<UserEntity> {
     return await this._userRepository
-      .save(queryParam, data)
+      .update(queryParam, data)
       .catch((error) => error);
   }
 

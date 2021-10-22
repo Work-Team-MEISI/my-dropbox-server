@@ -14,13 +14,19 @@ import { ForgotPasswordDTO } from './dtos/forgot-password.dto';
 import * as bcrypt from 'bcrypt';
 import { SignInDTO } from './dtos/sign-in.dto';
 import { SignUpDTO } from './dtos/sign-up.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('users/authentication')
 export class AuthenticationController {
-  constructor(private readonly _authenticationService: AuthenticationService) {}
+  constructor(
+    private readonly _authenticationService: AuthenticationService,
+    private readonly _jsonWebTokenService: JwtService,
+  ) {}
 
   @Get('sign-in')
-  public async signIn(@Query() signInDTO: SignInDTO): Promise<User> {
+  public async signIn(
+    @Query() signInDTO: SignInDTO,
+  ): Promise<{ user: User; idToken: string }> {
     const searchEmail = { email: signInDTO.email };
 
     const user = await this._authenticationService
@@ -41,7 +47,11 @@ export class AuthenticationController {
       throw ExceptionsHandler(HttpStatus.BAD_REQUEST);
     }
 
-    return user;
+    const payload = { username: user.username, sub: user.userId };
+
+    const idToken = this._jsonWebTokenService.sign(payload);
+
+    return { user: user, idToken: idToken };
   }
 
   @Post('sign-up')
@@ -80,24 +90,26 @@ export class AuthenticationController {
     @Query() email: string,
     @Body() forgotPasswordDTO: ForgotPasswordDTO,
   ): Promise<User> {
-    const searchedEmail = { email: email };
-
     const searchedUser = await this._authenticationService
-      .fetch(searchedEmail)
+      .fetch(email)
       .catch((error) => {
         throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
       });
 
-    if (typeof searchedUser !== 'undefined') {
-      throw ExceptionsHandler(HttpStatus.FOUND);
+    if (typeof searchedUser === 'undefined') {
+      throw ExceptionsHandler(HttpStatus.NOT_FOUND);
     }
 
     const hashedPassword = await bcrypt.hash(forgotPasswordDTO.password, 10);
 
     const updatePassword = { password: hashedPassword };
 
-    const updatedUser = this._authenticationService
-      .update(searchedEmail, updatePassword)
+    this._authenticationService.update(email, updatePassword).catch((error) => {
+      throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    const updatedUser = await this._authenticationService
+      .fetch(email)
       .catch((error) => {
         throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
       });
