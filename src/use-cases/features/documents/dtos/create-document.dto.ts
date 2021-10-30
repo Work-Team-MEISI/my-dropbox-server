@@ -1,14 +1,12 @@
-import { IsArray, IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsNotEmpty, IsString } from 'class-validator';
 import { User } from '../../users/types/user.type';
+
+import { Transform } from 'class-transformer';
 
 export class CreateDocumentDTO {
   @IsNotEmpty()
   @IsString()
   public name: string;
-
-  @IsNotEmpty()
-  @IsDate()
-  public createdAt: Date;
 
   @IsNotEmpty()
   @IsString()

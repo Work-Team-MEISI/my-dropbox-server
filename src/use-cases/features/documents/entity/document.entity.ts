@@ -4,6 +4,7 @@ import {
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  CreateDateColumn
 } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
 import { User } from '../../users/types/user.type';
@@ -16,14 +17,12 @@ export class DocumentEntity {
   @PrimaryColumn('text')
   public name;
 
-  @PrimaryColumn('date')
-  public createdAt;
-
   @PrimaryColumn('text')
   public extension;
 
-  @PrimaryColumn('blob')
-  public blob;
+  @CreateDateColumn()
+  public createdAt;
+
 
   @OneToMany((type) => UserEntity, (userEntity) => userEntity)
   @JoinColumn()
