@@ -16,8 +16,8 @@ export class DocumentsService implements IService<DocumentEntity> {
     throw new Error('Method not implemented.');
   }
 
-  public fetch<V>(queryParam: V): Promise<DocumentEntity> {
-    throw new Error('Method not implemented.');
+  public async fetch<V>(queryParam: V): Promise<DocumentEntity> {
+    return await this._documentRepository.findOne(queryParam).catch((error) => error);
   }
 
   public async create<K>(data: K): Promise<DocumentEntity> {

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Post, Query, Param } from '@nestjs/common';
 import { CreateDocumentDTO } from './dtos/create-document.dto';
 import { DeleteDocumentDTO } from './dtos/delete-document.dto';
 import { FetchDocumentDTO } from './dtos/fetch-document.dto';
@@ -20,9 +20,9 @@ export class DocumentsController {
     throw '';
   }
 
-  @Get("")
-  public fetchDocument(@Query() fetchDocumentDTO: FetchDocumentDTO): Document {
-    throw '';
+  @Get(":id")
+  public async fetchDocument(@Param() params): Promise<Document> {
+    return await this._documentsService.fetch(params.id);
   }
 
   @Post("create")

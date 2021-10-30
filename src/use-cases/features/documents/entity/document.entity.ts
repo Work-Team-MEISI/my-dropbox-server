@@ -3,6 +3,7 @@ import {
   JoinColumn,
   OneToMany,
   PrimaryColumn,
+  Column,
   PrimaryGeneratedColumn,
   CreateDateColumn
 } from 'typeorm';
@@ -14,13 +15,13 @@ export class DocumentEntity {
   @PrimaryGeneratedColumn()
   public documentId;
 
-  @PrimaryColumn('text')
+  @Column('text')
   public name;
 
-  @PrimaryColumn('text')
+  @Column('text')
   public extension;
 
-  @PrimaryColumn('bytea')
+  @Column('bytea')
   public blob;
 
   @CreateDateColumn()
