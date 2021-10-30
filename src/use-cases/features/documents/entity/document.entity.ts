@@ -20,6 +20,9 @@ export class DocumentEntity {
   @PrimaryColumn('text')
   public extension;
 
+  @PrimaryColumn('bytea')
+  public blob;
+
   @CreateDateColumn()
   public createdAt;
 
