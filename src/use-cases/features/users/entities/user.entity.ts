@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { DocumentEntity } from '../../documents/entities/document.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -13,4 +21,11 @@ export class UserEntity {
 
   @Column('text')
   password: string;
+
+  @ManyToOne(
+    (type) => DocumentEntity,
+    (documentEntity) => documentEntity.documentId,
+  )
+  @JoinColumn()
+  documents: Array<DocumentEntity>;
 }

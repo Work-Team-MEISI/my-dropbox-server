@@ -2,13 +2,11 @@ import {
   Entity,
   JoinColumn,
   OneToMany,
-  PrimaryColumn,
   Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn
+  CreateDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
-import { User } from '../../users/types/user.type';
 
 @Entity('documents')
 export class DocumentEntity {
@@ -27,8 +25,7 @@ export class DocumentEntity {
   @CreateDateColumn()
   public createdAt;
 
-
-  @OneToMany((type) => UserEntity, (userEntity) => userEntity)
+  @OneToMany((type) => UserEntity, (userEntity) => userEntity.userId)
   @JoinColumn()
   public users: Array<UserEntity>;
 }

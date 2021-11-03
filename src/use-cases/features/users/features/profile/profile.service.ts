@@ -5,13 +5,13 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../../entities/user.entity';
 
 @Injectable()
-export class AuthenticationService implements IService<UserEntity> {
+export class ProfileService implements IService<UserEntity> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly _userRepository: Repository<UserEntity>,
   ) {}
 
-  public fetchBulk<V>(queryParam?: V): Promise<Array<UserEntity>> {
+  fetchBulk<V>(queryParam?: V): Promise<UserEntity[]> {
     throw new Error('Method not implemented.');
   }
 
@@ -19,17 +19,15 @@ export class AuthenticationService implements IService<UserEntity> {
     return this._userRepository.findOne(queryParam).catch((error) => error);
   }
 
-  public async create<K>(data: K): Promise<UserEntity> {
-    return await this._userRepository.save(data).catch((error) => error);
+  create<K>(data: K): Promise<UserEntity> {
+    throw new Error('Method not implemented.');
   }
 
-  public async update<K, V>(queryParam: V, data: K): Promise<UserEntity> {
-    return await this._userRepository
-      .update(queryParam, data)
-      .catch((error) => error);
+  update<K, V>(queryParam: V, data: K): Promise<UserEntity> {
+    throw new Error('Method not implemented.');
   }
 
-  public delete<V>(queryParam: V): Promise<boolean> {
+  delete<V>(queryParam: V): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

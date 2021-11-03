@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IService } from 'src/interfaces/service.interface';
-import { Repository } from 'typeorm';
-import { DocumentsController } from './documents.controller';
-import { DocumentEntity } from './entity/document.entity';
+import { DeleteResult, Repository } from 'typeorm';
+import { DocumentEntity } from './entities/document.entity';
 
 @Injectable()
 export class DocumentsService implements IService<DocumentEntity> {
@@ -12,12 +11,14 @@ export class DocumentsService implements IService<DocumentEntity> {
     private readonly _documentRepository: Repository<DocumentEntity>,
   ) {}
 
-  public fetchBulk(): Promise<DocumentEntity[]> {
-    throw new Error('Method not implemented.');
+  public async fetchBulk<V>(queryParam?: V): Promise<DocumentEntity[]> {
+    return await this._documentRepository.find().catch((error) => error);
   }
 
   public async fetch<V>(queryParam: V): Promise<DocumentEntity> {
-    return await this._documentRepository.findOne(queryParam).catch((error) => error);
+    return await this._documentRepository
+      .findOne(queryParam)
+      .catch((error) => error);
   }
 
   public async create<K>(data: K): Promise<DocumentEntity> {
@@ -28,7 +29,11 @@ export class DocumentsService implements IService<DocumentEntity> {
     throw new Error('Method not implemented.');
   }
 
-  public delete<V>(queryParam: V): Promise<DocumentEntity> {
-    throw new Error('Method not implemented.');
+  public async delete<V>(queryParam: V): Promise<boolean> {
+    const deleteResult: DeleteResult = await this._documentRepository
+      .delete(queryParam)
+      .catch((error) => error);
+
+    return deleteResult.affected > 0 ? true : false;
   }
 }

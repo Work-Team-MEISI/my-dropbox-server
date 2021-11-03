@@ -4,8 +4,7 @@ import { AppService } from './app.service';
 import { UseCasesModule } from './use-cases/use-cases.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './use-cases/features/users/entities/user.entity';
-import { DocumentEntity } from './use-cases/features/documents/entity/document.entity';
-import { JwtModule } from '@nestjs/jwt';
+import { DocumentEntity } from './use-cases/features/documents/entities/document.entity';
 
 @Module({
   imports: [
