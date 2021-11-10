@@ -1,10 +1,11 @@
-import { User } from '../../users/types/user.type';
+import { UserEntity } from '../../users/entities/user.entity';
 
 export type Document = {
   documentId: string;
   name: string;
   createdAt: Date;
   extension: string;
-  users: Array<User>;
+  users: Array<UserEntity>;
+  creator: string;
   blob?: unknown;
 };

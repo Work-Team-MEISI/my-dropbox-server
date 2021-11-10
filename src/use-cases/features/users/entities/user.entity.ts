@@ -1,16 +1,15 @@
 import {
   Column,
   Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { DocumentEntity } from '../../documents/entities/document.entity';
 
 @Entity('users')
 export class UserEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   userId: string;
 
   @Column('text')
@@ -22,10 +21,8 @@ export class UserEntity {
   @Column('text')
   password: string;
 
-  @ManyToOne(
-    (type) => DocumentEntity,
-    (documentEntity) => documentEntity.documentId,
-  )
-  @JoinColumn()
-  documents: Array<DocumentEntity>;
+  @ManyToMany((type) => DocumentEntity, (document) => document.users, {
+    cascade: true,
+  })
+  public documents: Array<DocumentEntity>;
 }

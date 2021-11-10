@@ -1,8 +1,6 @@
 import { IsArray, IsDateString, IsNotEmpty, IsString } from 'class-validator';
 import { User } from '../../users/types/user.type';
 
-import { Transform } from 'class-transformer';
-
 export class CreateDocumentDTO {
   @IsNotEmpty()
   @IsString()
@@ -13,8 +11,12 @@ export class CreateDocumentDTO {
   public extension: string;
 
   @IsNotEmpty()
+  @IsString()
+  public creator: string;
+
+  @IsNotEmpty()
   @IsArray()
-  public users: Array<User>;
+  public users: Array<string>;
 
   @IsNotEmpty()
   public blob: unknown;

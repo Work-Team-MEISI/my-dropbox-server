@@ -1,6 +1,7 @@
-import { Controller, Get, HttpStatus, Request } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Request } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
+import { FetchUserDTO } from '../../dtos/fetch-user.dto';
 import { User } from '../../types/user.type';
 import { ProfileService } from './profile.service';
 
@@ -22,6 +23,23 @@ export class ProfileController {
     const userId = { userId: decodedToken.sub };
 
     const user = this._profileService.fetch(userId).catch((error) => {
+      throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    if (typeof user === 'undefined') {
+      throw ExceptionsHandler(HttpStatus.NOT_FOUND);
+    }
+
+    return user;
+  }
+
+  @Get('')
+  public async fetchUserByEmail(
+    @Body() fetchUserDTO: FetchUserDTO,
+  ): Promise<User> {
+    const data = { email: fetchUserDTO.email };
+
+    const user = this._profileService.fetch(data).catch((error) => {
       throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 

@@ -12,7 +12,9 @@ export class DocumentsService implements IService<DocumentEntity> {
   ) {}
 
   public async fetchBulk<V>(queryParam?: V): Promise<DocumentEntity[]> {
-    return await this._documentRepository.find().catch((error) => error);
+    return await this._documentRepository
+      .find(queryParam)
+      .catch((error) => error);
   }
 
   public async fetch<V>(queryParam: V): Promise<DocumentEntity> {
@@ -25,8 +27,10 @@ export class DocumentsService implements IService<DocumentEntity> {
     return await this._documentRepository.save(data).catch((error) => error);
   }
 
-  public update<K, V>(queryParam: V, data: K): Promise<DocumentEntity> {
-    throw new Error('Method not implemented.');
+  public async update<K, V>(queryParam: V, data: K): Promise<DocumentEntity> {
+    return await this._documentRepository
+      .update(queryParam, data)
+      .catch((error) => error);
   }
 
   public async delete<V>(queryParam: V): Promise<boolean> {

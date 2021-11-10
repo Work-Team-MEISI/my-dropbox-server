@@ -12,5 +12,6 @@ import { ProfileService } from './profile.service';
     TypeOrmModule.forFeature([UserEntity]),
     JwtModule.register({ secret: 'secret' }),
   ],
+  exports: [ProfileService],
 })
 export class ProfileModule {}
