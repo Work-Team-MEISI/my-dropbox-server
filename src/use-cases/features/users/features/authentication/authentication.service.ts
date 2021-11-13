@@ -11,25 +11,33 @@ export class AuthenticationService implements IService<UserEntity> {
     private readonly _userRepository: Repository<UserEntity>,
   ) {}
 
-  public fetchBulk<V>(queryParam?: V): Promise<Array<UserEntity>> {
-    throw new Error('Method not implemented.');
+  public async fetchBulk<K>(queryParam?: K): Promise<UserEntity[]> {
+    return await this._userRepository.find(queryParam).catch((error) => error);
   }
 
-  public async fetch<V>(queryParam: V): Promise<UserEntity> {
-    return this._userRepository.findOne(queryParam).catch((error) => error);
-  }
-
-  public async create<K>(data: K): Promise<UserEntity> {
-    return await this._userRepository.save(data).catch((error) => error);
-  }
-
-  public async update<K, V>(queryParam: V, data: K): Promise<UserEntity> {
+  public async fetch<K>(queryParam?: K): Promise<UserEntity> {
     return await this._userRepository
-      .update(queryParam, data)
+      .findOne(queryParam)
       .catch((error) => error);
   }
 
-  public delete<V>(queryParam: V): Promise<boolean> {
+  public async create<K, P>(queryParam?: K, body?: P): Promise<UserEntity> {
+    return await this._userRepository
+      .save(queryParam, body)
+      .catch((error) => error);
+  }
+
+  public async update<K, P>(queryParam?: K, body?: P): Promise<UserEntity> {
+    return await this._userRepository
+      .save(queryParam, body)
+      .catch((error) => error);
+  }
+
+  public delete<K>(queryParam?: K): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  public deleteBulk<K>(queryParam?: K): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

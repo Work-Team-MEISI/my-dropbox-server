@@ -1,7 +1,8 @@
 export interface IService<T> {
-  fetchBulk<V>(queryParam?: V): Promise<Array<T>>;
-  fetch<V>(queryParam: V): Promise<T>;
-  create<K>(data: K): Promise<T>;
-  update<K, V>(queryParam: V, data: K): Promise<T>;
-  delete<V>(queryParam: V): Promise<boolean>;
+  fetchBulk<K>(queryParam?: K): Promise<Array<T>>;
+  fetch<K>(queryParam?: K): Promise<T>;
+  create<K, P>(queryParam?: K, body?: P): Promise<T>;
+  update<K, P>(queryParam?: K, body?: P): Promise<T>;
+  delete<K>(queryParam?: K): Promise<boolean>;
+  deleteBulk<K>(queryParam?: K): Promise<boolean>;
 }

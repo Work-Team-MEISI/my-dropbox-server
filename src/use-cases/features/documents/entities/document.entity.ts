@@ -3,10 +3,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
-import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('documents')
 export class DocumentEntity {
@@ -22,13 +19,12 @@ export class DocumentEntity {
   @Column('text')
   public creator;
 
+  @Column('text', { array: true })
+  public users: Array<string>;
+
   @Column('bytea')
   public blob;
 
   @CreateDateColumn()
   public createdAt;
-
-  @JoinTable()
-  @ManyToMany((type) => UserEntity, (user) => user.documents)
-  public users: Array<UserEntity>;
 }

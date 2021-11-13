@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { DocumentEntity } from '../../documents/entities/document.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -20,9 +13,4 @@ export class UserEntity {
 
   @Column('text')
   password: string;
-
-  @ManyToMany((type) => DocumentEntity, (document) => document.users, {
-    cascade: true,
-  })
-  public documents: Array<DocumentEntity>;
 }

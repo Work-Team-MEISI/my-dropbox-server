@@ -4,48 +4,38 @@ import {
   Delete,
   Get,
   HttpStatus,
-  Post,
-  Query,
   Param,
-  Request,
+  Post,
   Put,
+  Query,
 } from '@nestjs/common';
+import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
+import { DocumentsService } from './documents.service';
 import { CreateDocumentDTO } from './dtos/create-document.dto';
 import { DeleteDocumentDTO } from './dtos/delete-document.dto';
+import { FetchDocumentsDTO } from './dtos/fetch-documents.dto';
+import { UpdateDocumenDTO } from './dtos/update-document.dto';
 import { Document } from './types/document.type';
-import { DocumentsService } from './documents.service';
-import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
-import { JwtService } from '@nestjs/jwt';
-import { AuthenticationService } from '../users/features/authentication/authentication.service';
 
 @Controller('documents')
 export class DocumentsController {
-  constructor(
-    private readonly _documentsService: DocumentsService,
-    private readonly _authenticationService: AuthenticationService,
-    private readonly _jwtService: JwtService,
-  ) {}
+  constructor(private readonly _documentsService: DocumentsService) {}
 
   @Get('')
   public async fetchDocuments(
-    @Request() request,
-  ): Promise<Array<Omit<Document, 'blob'>>> {
-    const token: string = request.headers.authorization;
+    @Query() fetchDocumentsDTO: FetchDocumentsDTO,
+  ): Promise<Array<Document>> {
+    const { userId } = fetchDocumentsDTO;
 
-    const splitedToken = token.split(' ');
-
-    const decodedToken = this._jwtService.decode(splitedToken[1]);
-
-    const userId = decodedToken.sub;
-
-    const docs = await this._documentsService.fetchBulk().catch((error) => {
-      throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
-    });
+    const documents = await this._documentsService
+      .fetchBulk(userId)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
 
     const docsAvailable = [];
 
-    for (const doc of docs) {
-      console.log(doc);
+    for (const doc of documents) {
       const userEquals = doc.users.findIndex((user) => user === userId);
 
       if (userEquals !== -1) {
@@ -64,7 +54,7 @@ export class DocumentsController {
   }
 
   @Get(':documentId')
-  public async fetchDocument(
+  public fetchDocument(
     @Param('documentId') fetchDocumentDTO,
   ): Promise<Document> {
     const doc = this._documentsService
@@ -85,17 +75,6 @@ export class DocumentsController {
     @Body() createDocumentDTO: CreateDocumentDTO,
   ): Promise<Document> {
     const { name, extension, users, blob, creator } = createDocumentDTO;
-    // const usersToAdd = [];
-
-    // for (const user of users) {
-    //   const searchedUser = await this._authenticationService
-    //     .fetch({ userId: user })
-    //     .catch((error) => {
-    //       throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     });
-
-    //   usersToAdd.push(searchedUser);
-    // }
 
     const newDocument = {
       name: name,
@@ -108,14 +87,29 @@ export class DocumentsController {
     const createdDocument = await this._documentsService
       .create(newDocument)
       .catch((error) => {
-        console.log(error);
         throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
       });
 
     return createdDocument;
   }
 
-  @Delete('')
+  @Put(':documentId')
+  public async updateDocument(
+    @Param('documentId') documentId: string,
+    @Body() updateDocumentDTO: UpdateDocumenDTO,
+  ): Promise<Document> {
+    const query = { documentId: documentId };
+
+    const document = await this._documentsService
+      .update(query, updateDocumentDTO)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    return document;
+  }
+
+  @Delete()
   public async deleteDocument(
     @Query() deleteDocumentDTO: DeleteDocumentDTO,
   ): Promise<boolean> {

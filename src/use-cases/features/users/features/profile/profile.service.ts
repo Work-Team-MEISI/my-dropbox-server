@@ -11,23 +11,27 @@ export class ProfileService implements IService<UserEntity> {
     private readonly _userRepository: Repository<UserEntity>,
   ) {}
 
-  fetchBulk<V>(queryParam?: V): Promise<UserEntity[]> {
+  public fetchBulk<K>(queryParam?: K): Promise<UserEntity[]> {
     throw new Error('Method not implemented.');
   }
 
-  public async fetch<V>(queryParam: V): Promise<UserEntity> {
+  public fetch<K>(queryParam?: K): Promise<UserEntity> {
     return this._userRepository.findOne(queryParam).catch((error) => error);
   }
 
-  create<K>(data: K): Promise<UserEntity> {
+  public create<K, P>(queryParam?: K, body?: P): Promise<UserEntity> {
     throw new Error('Method not implemented.');
   }
 
-  update<K, V>(queryParam: V, data: K): Promise<UserEntity> {
+  public update<K, P>(queryParam?: K, body?: P): Promise<UserEntity> {
     throw new Error('Method not implemented.');
   }
 
-  delete<V>(queryParam: V): Promise<boolean> {
+  public delete<K>(queryParam?: K): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  public deleteBulk<K>(queryParam?: K): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }
