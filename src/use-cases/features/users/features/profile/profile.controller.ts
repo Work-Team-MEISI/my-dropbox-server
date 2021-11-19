@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Request } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Request } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
 import { User } from '../../types/user.type';
@@ -15,7 +15,7 @@ export class ProfileController {
   public async fetchUser(@Request() request): Promise<User> {
     const token: string = request.headers.authorization;
 
-    const decodedToken = this._jwtService.decode(token);
+    const decodedToken = this._jwtService.decode(token.split(' ')[1]);
 
     const userId = { userId: decodedToken.sub };
 

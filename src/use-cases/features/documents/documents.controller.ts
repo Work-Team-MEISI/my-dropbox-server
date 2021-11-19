@@ -3,12 +3,14 @@ import {
   Controller,
   Delete,
   Get,
+  Request,
   HttpStatus,
   Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDTO } from './dtos/create-document.dto';
@@ -19,16 +21,21 @@ import { Document } from './types/document.type';
 
 @Controller('documents')
 export class DocumentsController {
-  constructor(private readonly _documentsService: DocumentsService) {}
+  constructor(
+    private readonly _documentsService: DocumentsService,
+    private readonly _jwtService: JwtService,
+  ) {}
 
   @Get('')
-  public async fetchDocuments(
-    @Query() fetchDocumentsDTO: FetchDocumentsDTO,
-  ): Promise<Array<Document>> {
-    const { userId } = fetchDocumentsDTO;
+  public async fetchDocuments(@Request() request): Promise<Array<Document>> {
+    const token: string = request.headers.authorization;
+
+    const decodedToken = this._jwtService.decode(token.split(' ')[1]);
+
+    const userId = decodedToken.sub;
 
     const documents = await this._documentsService
-      .fetchBulk(userId)
+      .fetchBulk()
       .catch((error) => {
         throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
       });
