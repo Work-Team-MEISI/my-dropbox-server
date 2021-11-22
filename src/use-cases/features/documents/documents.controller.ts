@@ -107,6 +107,9 @@ export class DocumentsController {
   ): Promise<Document> {
     const query = { documentId: documentId };
 
+    console.log(query);
+    console.log(updateDocumentDTO);
+
     const document = await this._documentsService
       .update(query, updateDocumentDTO)
       .catch((error) => {

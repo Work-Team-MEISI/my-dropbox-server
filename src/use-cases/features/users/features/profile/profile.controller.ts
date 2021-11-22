@@ -1,4 +1,12 @@
-import { Controller, Get, HttpStatus, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Query,
+  Request,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
 import { User } from '../../types/user.type';
@@ -19,7 +27,38 @@ export class ProfileController {
 
     const userId = { userId: decodedToken.sub };
 
-    const user = this._profileService.fetch(userId).catch((error) => {
+    const user = await this._profileService.fetch(userId).catch((error) => {
+      throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    if (typeof user === 'undefined') {
+      throw ExceptionsHandler(HttpStatus.NOT_FOUND);
+    }
+
+    return user;
+  }
+
+  @Get('params')
+  public async fetchUserByEmail(@Query() fetchUserByEmailDTO): Promise<User> {
+    const user = await this._profileService
+      .fetch(fetchUserByEmailDTO)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    if (typeof user === 'undefined') {
+      throw ExceptionsHandler(HttpStatus.NOT_FOUND);
+    }
+
+    return user;
+  }
+
+  @Get(':userId')
+  public async fetchUserById(@Param('userId') fetchUserByIdDTO): Promise<User> {
+    const userId = { userId: fetchUserByIdDTO };
+    console.log(userId);
+
+    const user = await this._profileService.fetch(userId).catch((error) => {
       throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
