@@ -29,6 +29,8 @@ export class AuthenticationController {
   ): Promise<{ user: User; idToken: string }> {
     const searchEmail = { email: signInDTO.email };
 
+    console.log(searchEmail);
+
     const user = await this._authenticationService
       .fetch(searchEmail)
       .catch((error) => {

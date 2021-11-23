@@ -61,11 +61,11 @@ export class DocumentsController {
   }
 
   @Get(':documentId')
-  public fetchDocument(
+  public async fetchDocument(
     @Param('documentId') fetchDocumentDTO,
   ): Promise<Document> {
-    const doc = this._documentsService
-      .fetch(fetchDocumentDTO.documentId)
+    const doc = await this._documentsService
+      .fetch({ documentId: fetchDocumentDTO })
       .catch((error) => {
         throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
       });
