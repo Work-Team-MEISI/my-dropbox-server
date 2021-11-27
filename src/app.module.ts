@@ -5,6 +5,7 @@ import { UseCasesModule } from './use-cases/use-cases.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './use-cases/features/users/entities/user.entity';
 import { DocumentEntity } from './use-cases/features/documents/entities/document.entity';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [

@@ -17,7 +17,7 @@ export class DocumentsService implements IService<DocumentEntity> {
 
   public async fetch<K>(queryParam?: K): Promise<DocumentEntity> {
     return await this._documentRepository
-      .find(queryParam)
+      .findOne(queryParam)
       .catch((error) => error);
   }
 

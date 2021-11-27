@@ -22,7 +22,7 @@ export class DocumentEntity {
   @Column('text', { array: true })
   public users: Array<string>;
 
-  @Column('bytea')
+  @Column('jsonb')
   public blob;
 
   @CreateDateColumn()

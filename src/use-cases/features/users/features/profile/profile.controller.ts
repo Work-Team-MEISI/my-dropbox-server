@@ -56,7 +56,6 @@ export class ProfileController {
   @Get(':userId')
   public async fetchUserById(@Param('userId') fetchUserByIdDTO): Promise<User> {
     const userId = { userId: fetchUserByIdDTO };
-    console.log(userId);
 
     const user = await this._profileService.fetch(userId).catch((error) => {
       throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);

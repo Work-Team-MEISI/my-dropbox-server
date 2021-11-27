@@ -18,6 +18,5 @@ export class CreateDocumentDTO {
   @IsArray()
   public users: Array<string>;
 
-  @IsNotEmpty()
-  public blob: unknown;
+  public blob: any;
 }

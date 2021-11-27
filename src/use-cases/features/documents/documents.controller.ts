@@ -9,8 +9,18 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
+  Res,
+  UploadedFiles,
+  Header,
+  HttpCode,
+  StreamableFile,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDTO } from './dtos/create-document.dto';
@@ -25,6 +35,39 @@ export class DocumentsController {
     private readonly _documentsService: DocumentsService,
     private readonly _jwtService: JwtService,
   ) {}
+
+  @Post('')
+  @UseInterceptors(FileInterceptor('file'))
+  public async createDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() request,
+  ): Promise<Document> {
+    console.log(request);
+    console.log(file);
+    const entension = file.mimetype.split('/');
+
+    const token: string = request.headers.authorization;
+
+    const decodedToken = this._jwtService.decode(token.split(' ')[1]);
+
+    const userId = decodedToken.sub;
+
+    const newDocument = {
+      name: file.originalname,
+      extension: entension,
+      users: [userId],
+      creator: userId,
+      blob: file,
+    };
+
+    const createdDocument = await this._documentsService
+      .create(newDocument)
+      .catch((error) => {
+        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
+    return createdDocument;
+  }
 
   @Get('')
   public async fetchDocuments(@Request() request): Promise<Array<Document>> {
@@ -52,6 +95,7 @@ export class DocumentsController {
           extension: doc.extension,
           createdAt: doc.createdAt,
           creator: doc.creator,
+          blob: doc.blob,
           users: doc.users,
         });
       }
@@ -61,9 +105,12 @@ export class DocumentsController {
   }
 
   @Get(':documentId')
+  @HttpCode(201)
+  @Header('Content-Type', 'image/pdf')
+  @Header('Content-Disposition', 'attachment; filename=test.pdf')
   public async fetchDocument(
     @Param('documentId') fetchDocumentDTO,
-  ): Promise<Document> {
+  ): Promise<any> {
     const doc = await this._documentsService
       .fetch({ documentId: fetchDocumentDTO })
       .catch((error) => {
@@ -74,30 +121,9 @@ export class DocumentsController {
       throw ExceptionsHandler(HttpStatus.NOT_FOUND);
     }
 
-    return doc;
-  }
+    const file = createReadStream(join(process.cwd(), doc.blob.path));
 
-  @Post('')
-  public async createDocument(
-    @Body() createDocumentDTO: CreateDocumentDTO,
-  ): Promise<Document> {
-    const { name, extension, users, blob, creator } = createDocumentDTO;
-
-    const newDocument = {
-      name: name,
-      extension: extension,
-      users: users,
-      creator: creator,
-      blob: blob,
-    };
-
-    const createdDocument = await this._documentsService
-      .create(newDocument)
-      .catch((error) => {
-        throw ExceptionsHandler(HttpStatus.INTERNAL_SERVER_ERROR);
-      });
-
-    return createdDocument;
+    return new StreamableFile(file);
   }
 
   @Put(':documentId')
@@ -106,9 +132,6 @@ export class DocumentsController {
     @Body() updateDocumentDTO: UpdateDocumenDTO,
   ): Promise<Document> {
     const query = { documentId: documentId };
-
-    console.log(query);
-    console.log(updateDocumentDTO);
 
     const document = await this._documentsService
       .update(query, updateDocumentDTO)

@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ProfileModule } from '../users/features/profile/profile.module';
 import { UserEntity } from '../users/entities/user.entity';
 import { AuthenticationService } from '../users/features/authentication/authentication.service';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   providers: [DocumentsService, AuthenticationService],
@@ -15,6 +16,7 @@ import { AuthenticationService } from '../users/features/authentication/authenti
     ProfileModule,
     TypeOrmModule.forFeature([DocumentEntity, UserEntity]),
     JwtModule.register({ secret: 'secret' }),
+    MulterModule.register({ dest: './uploads' }),
   ],
 })
 export class DocumentsModule {}
