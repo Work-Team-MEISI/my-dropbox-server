@@ -12,11 +12,7 @@ import { MulterModule } from '@nestjs/platform-express';
     UseCasesModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'admin',
-      database: 'my-dropbox',
+      url: process.env.DATABASE_URL,
       entities: [UserEntity, DocumentEntity],
       synchronize: true,
     }),
