@@ -23,6 +23,6 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.use(bodyParser.text({ type: 'text/html' }));
   app.use(bodyParser.json({ limit: '50mb' }));
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
