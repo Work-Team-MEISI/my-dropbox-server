@@ -6,15 +6,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './use-cases/features/users/entities/user.entity';
 import { DocumentEntity } from './use-cases/features/documents/entities/document.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import * as PostgressConnectionStringParser from "pg-connection-string";
+
+const databaseUrl: string = process.env.DATABASE_URL;
+const connectionOptions = PostgressConnectionStringParser.parse(databaseUrl);
 
 @Module({
   imports: [
     UseCasesModule,
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      entities: [UserEntity, DocumentEntity],
+      type: "postgres",
+      host: connectionOptions.host,
+      username: connectionOptions.user,
+      password: connectionOptions.password,
+      database: connectionOptions.database,
       synchronize: true,
+      entities: [UserEntity, DocumentEntity],
       extra: {
         ssl: true
       }
