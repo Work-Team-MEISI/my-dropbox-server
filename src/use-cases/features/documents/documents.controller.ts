@@ -11,11 +11,8 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
-  Res,
-  UploadedFiles,
-  Header,
-  HttpCode,
   StreamableFile,
+  Response,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -23,9 +20,7 @@ import { createReadStream } from 'fs';
 import { join } from 'path';
 import { ExceptionsHandler } from 'src/helpers/handlers/exceptions.handler';
 import { DocumentsService } from './documents.service';
-import { CreateDocumentDTO } from './dtos/create-document.dto';
 import { DeleteDocumentDTO } from './dtos/delete-document.dto';
-import { FetchDocumentsDTO } from './dtos/fetch-documents.dto';
 import { UpdateDocumenDTO } from './dtos/update-document.dto';
 import { Document } from './types/document.type';
 
@@ -103,12 +98,11 @@ export class DocumentsController {
   }
 
   @Get(':documentId')
-  @HttpCode(201)
-  @Header('Content-Type', 'image/pdf')
-  @Header('Content-Disposition', 'attachment; filename=test.pdf')
   public async fetchDocument(
     @Param('documentId') fetchDocumentDTO,
+    @Response({ passthrough: true }) res,
   ): Promise<any> {
+    console.log(fetchDocumentDTO);
     const doc = await this._documentsService
       .fetch({ documentId: fetchDocumentDTO })
       .catch((error) => {
@@ -120,6 +114,9 @@ export class DocumentsController {
     }
 
     const file = createReadStream(join(process.cwd(), doc.blob.path));
+
+    res.set('Content-Type', doc.blob.mimetype);
+    res.set('Content-Disposition', `attachment; filename=${doc.name}`);
 
     return new StreamableFile(file);
   }
