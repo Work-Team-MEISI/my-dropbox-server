@@ -29,7 +29,7 @@ export class AuthenticationController {
   ): Promise<{ user: User; idToken: string }> {
     const searchEmail = { email: signInDTO.email };
 
-    console.log(searchEmail);
+    console.log(signInDTO);
 
     const user = await this._authenticationService
       .fetch(searchEmail)

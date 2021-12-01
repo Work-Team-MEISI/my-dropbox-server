@@ -42,8 +42,6 @@ export class DocumentsController {
     @UploadedFile() file: Express.Multer.File,
     @Request() request,
   ): Promise<Document> {
-    console.log(request);
-    console.log(file);
     const entension = file.mimetype.split('/');
 
     const token: string = request.headers.authorization;
@@ -54,7 +52,7 @@ export class DocumentsController {
 
     const newDocument = {
       name: file.originalname,
-      extension: entension,
+      extension: entension[1],
       users: [userId],
       creator: userId,
       blob: file,
