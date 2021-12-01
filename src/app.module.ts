@@ -15,6 +15,9 @@ import { MulterModule } from '@nestjs/platform-express';
       url: process.env.DATABASE_URL,
       entities: [UserEntity, DocumentEntity],
       synchronize: true,
+      extra: {
+        ssl: true
+      }
     }),
   ],
   controllers: [AppController],
